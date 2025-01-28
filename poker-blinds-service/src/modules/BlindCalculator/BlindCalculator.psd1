@@ -1,13 +1,8 @@
-poker-blinds-service
-├── src
-│   ├── PokerBlindsService.ps1
-│   └── modules
-│       └── BlindCalculator
-│           ├── BlindCalculator.psm1
-│           └── BlindCalculator.psd1
-├── tests
-│   └── BlindCalculator.Tests.ps1
-├── Dockerfile
-├── docker-compose.yml
-├── install-modules.ps1
-└── README.md
+@{
+    RootModule = 'BlindCalculator.psm1'
+    ModuleVersion = '1.0.0'
+    GUID = '12345678-1234-1234-1234-123456789012'
+    Author = 'Your Name'
+    Description = 'Poker Tournament Blind Structure Calculator'
+    FunctionsToExport = @('Calculate-BlindStructure')
+}
