@@ -44,4 +44,6 @@ jobs:
             --registry-login-server gazcontainerreg123.azurecr.io \
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.ACR_PASSWORD }} \
-            --restart-policy Always
+            --restart-policy Always \
+            --os-typ Linux \
+            --ports 80 8080
