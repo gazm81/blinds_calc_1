@@ -1,0 +1,40 @@
+name: Build and Deploy to ACR and ACI
+
+on:
+  push:
+    branches:
+      - master  # Runs when code is pushed to master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the source code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Log in to Azure
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Log in to ACR
+      - name: Log in to Azure Container Registry (ACR)
+        run: |
+          az acr login --name gazcontainerreg123
+
+      # Build and Push Docker Image to ACR
+      - name: Build & Push Image
+        run: |
+          docker build -t gazcontainerreg123.azurecr.io/blind_calc_1:latest .
+          docker push gazcontainerreg123.azurecr.io/blind_calc_1:latest
+
+      # Deploy Updated Image to ACI
+      - name: Update Azure Container Instance (ACI)
+        run: |
+          az container update \
+            --name blind-calc-1 \
+            --resource-group blind_calc_1 \
+            --image gazcontainerreg123.azurecr.io/blind_calc_1:latest
