@@ -25,6 +25,13 @@ function Calculate-BlindStructure {
         $currentBig = $currentSmall * 2
     }
 
+    Write-Host "Processing request with parameters:" -ForegroundColor Cyan
+    Write-Host "- Players: $numPlayers" -ForegroundColor Gray
+    Write-Host "- Round Length: $roundLengthMinutes minutes" -ForegroundColor Gray
+    Write-Host "- Starting Small Blind: $startingSmallBlind" -ForegroundColor Gray
+    Write-Host "- Starting Big Blind: $startingBigBlind" -ForegroundColor Gray
+    Write-Host "- Starting Chips: $startingChips" -ForegroundColor Gray
+
     return $rounds
 }
 
