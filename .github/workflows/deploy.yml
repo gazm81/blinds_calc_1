@@ -34,7 +34,7 @@ jobs:
       # Deploy Updated Image to ACI
       - name: Deploy Updated Image to ACI
         run: |
-          az container delete --name blind-calc-1 --resource-group blind_calc_1 --yes
+          az container delete --name blind-calc-1 --resource-group blind_calc_1 --yes || true
           az container create \
             --name blind-calc-1 \
             --resource-group blind_calc_1 \
