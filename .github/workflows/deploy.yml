@@ -32,9 +32,16 @@ jobs:
           docker push gazcontainerreg123.azurecr.io/blind_calc_1:latest
 
       # Deploy Updated Image to ACI
-      - name: Update Azure Container Instance (ACI)
+      - name: Deploy Updated Image to ACI
         run: |
-          az container update \
+          az container delete --name blind-calc-1 --resource-group blind_calc_1 --yes
+          az container create \
             --name blind-calc-1 \
             --resource-group blind_calc_1 \
-            --image gazcontainerreg123.azurecr.io/blind_calc_1:latest
+            --image gazcontainerreg123.azurecr.io/blind_calc_1:latest \
+            --dns-name-label blind-calc-1 \
+            --cpu 1 --memory 1 \
+            --registry-login-server gazcontainerreg123.azurecr.io \
+            --registry-username ${{ secrets.ACR_USERNAME }} \
+            --registry-password ${{ secrets.ACR_PASSWORD }} \
+            --restart-policy Always
