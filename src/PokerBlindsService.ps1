@@ -2,10 +2,10 @@ Import-Module "$PSScriptRoot/modules/BlindCalculator/BlindCalculator.psm1"
 
 try {
     $Listener = New-Object System.Net.HttpListener
-    $Listener.Prefixes.Add("http://+:8080/")
+    $Listener.Prefixes.Add("http://+:80/")
     $Listener.Start()
 
-    Write-Host "Server started at http://localhost:8080/"
+    Write-Host "Server started at http://localhost:80/"
 
     while ($Listener.IsListening) {
         $context = $Listener.GetContext()
