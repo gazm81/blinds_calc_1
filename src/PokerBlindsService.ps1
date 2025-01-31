@@ -15,7 +15,7 @@ try {
         $context.Response.Headers.Add("Content-Type", "application/json")
 
         try {
-            if ($context.Request.HttpMethod -eq 'GET' -and $context.Request.RawUrl -match '^/pokerblinds/calculate') {
+            if ($context.Request.HttpMethod -eq 'GET' ){#-and $context.Request.RawUrl -match '^/pokerblinds/calculate') {
                 $params = [System.Web.HttpUtility]::ParseQueryString($context.Request.Url.Query)
                 
                 $result = Calculate-BlindStructure `
