@@ -18,12 +18,12 @@ try {
             if ($context.Request.HttpMethod -eq 'GET' ){#-and $context.Request.RawUrl -match '^/pokerblinds/calculate') {
                 $params = [System.Web.HttpUtility]::ParseQueryString($context.Request.Url.Query)
                 
-                $result = Calculate-BlindStructure `
-                    -numPlayers ($params["numPlayers"] ? [int]$params["numPlayers"] : 6) `
-                    -roundLengthMinutes ($params["roundLength"] ? [int]$params["roundLength"] : 15) `
-                    -startingSmallBlind ($params["startingSmall"] ? [int]$params["startingSmall"] : 25) `
-                    -startingBigBlind ($params["startingBig"] ? [int]$params["startingBig"] : 50) `
-                    -startingChips ($params["chipsPerPlayer"] ? [int]$params["chipsPerPlayer"] : 1000)
+                $result = Get-PokerBlindStructure `
+                    -NumberOfPlayers ($params["NumberOfPlayers"] ? [int]$params["NumberOfPlayers"] : 6) `
+                    -BlindDurationMinutes ($params["BlindDurationMinutes"] ? [int]$params["BlindDurationMinutes"] : 15) `
+                    -StartingSmallBlind ($params["StartingSmallBlind"] ? [int]$params["StartingSmallBlind"] : 25) `
+                    -StartingBigBlind ($params["StartingBigBlind"] ? [int]$params["StartingBigBlind"] : 50) `
+                    -StartingStack ($params["StartingStack"] ? [int]$params["StartingStack"] : 1000)
                     
                 # Create HTML table
                 $htmlTemplate = @"
@@ -57,11 +57,11 @@ try {
     <script>
         function updateValues() {
             const params = new URLSearchParams();
-            params.append('numPlayers', document.getElementById('numPlayers').value);
-            params.append('roundLength', document.getElementById('roundLength').value);
-            params.append('startingSmall', document.getElementById('startingSmall').value);
-            params.append('startingBig', document.getElementById('startingBig').value);
-            params.append('chipsPerPlayer', document.getElementById('chipsPerPlayer').value);
+            params.append('NumberOfPlayers', document.getElementById('NumberOfPlayers').value);
+            params.append('BlindDurationMinutes', document.getElementById('BlindDurationMinutes').value);
+            params.append('StartingSmallBlind', document.getElementById('StartingSmallBlind').value);
+            params.append('StartingBigBlind', document.getElementById('StartingBigBlind').value);
+            params.append('StartingStack', document.getElementById('StartingStack').value);
             
             window.location.href = '/pokerblinds/calculate?' + params.toString();
         }
@@ -71,23 +71,23 @@ try {
     <form class="config-section" onsubmit="event.preventDefault(); updateValues();">
         <div class="form-row">
             <label>Number of Players:</label>
-            <input type="number" id="numPlayers" value="$($params["numPlayers"] ? $params["numPlayers"] : 6)">
+            <input type="number" id="numPlayers" value="$($params["NumberOfPlayers"] ? $params["NumberOfPlayers"] : 6)">
         </div>
         <div class="form-row">
             <label>Round Length (minutes):</label>
-            <input type="number" id="roundLength" value="$($params["roundLength"] ? $params["roundLength"] : 15)">
+            <input type="number" id="roundLength" value="$($params["BlindDurationMinutes"] ? $params["BlindDurationMinutes"] : 15)">
         </div>
         <div class="form-row">
             <label>Starting Small Blind:</label>
-            <input type="number" id="startingSmall" value="$($params["startingSmall"] ? $params["startingSmall"] : 25)">
+            <input type="number" id="startingSmall" value="$($params["StartingSmallBlind"] ? $params["StartingSmallBlind"] : 25)">
         </div>
         <div class="form-row">
             <label>Starting Big Blind:</label>
-            <input type="number" id="startingBig" value="$($params["startingBig"] ? $params["startingBig"] : 50)">
+            <input type="number" id="startingBig" value="$($params["StartingBigBlind"] ? $params["StartingBigBlind"] : 50)">
         </div>
         <div class="form-row">
             <label>Starting Chips:</label>
-            <input type="number" id="chipsPerPlayer" value="$($params["chipsPerPlayer"] ? $params["chipsPerPlayer"] : 1000)">
+            <input type="number" id="chipsPerPlayer" value="$($params["StartingStack"] ? $params["StartingStack"] : 1000)">
         </div>
         <button type="submit">Update Values</button>
     </form>
@@ -99,7 +99,7 @@ try {
             <th>Time</th>
         </tr>
         $($result | ForEach-Object {
-            "<tr><td>$($_.Level)</td><td>$($_.SmallBlind)</td><td>$($_.BigBlind)</td><td>$($_.TimeInMinutes)</td></tr>"
+            "<tr><td>$($_.RoundNumber)</td><td>$($_.SmallBlind)</td><td>$($_.BigBlind)</td><td>$($_.RoundStartTime.ToShortTimeString())</td></tr>"
         })
     </table>
 </body>
