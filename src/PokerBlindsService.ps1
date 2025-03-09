@@ -22,7 +22,6 @@ try {
                     -NumberOfPlayers ($params["NumberOfPlayers"] ? [int]$params["NumberOfPlayers"] : 6) `
                     -BlindDurationMinutes ($params["BlindDurationMinutes"] ? [int]$params["BlindDurationMinutes"] : 15) `
                     -StartingSmallBlind ($params["StartingSmallBlind"] ? [int]$params["StartingSmallBlind"] : 25) `
-                    -StartingBigBlind ($params["StartingBigBlind"] ? [int]$params["StartingBigBlind"] : 50) `
                     -StartingStack ($params["StartingStack"] ? [int]$params["StartingStack"] : 1000)
                     
                 # Create HTML table
