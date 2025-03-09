@@ -13,10 +13,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
       
-      - name: Setup PowerShell
-        uses: microsoft/powershell@v1
-        with:
-          powershell-version: '7.0'
+      #- name: Setup PowerShell
+      #  uses: microsoft/powershell@v1
+      #  with:
+      #    powershell-version: '7.0'
 
       - name: Install Pester
         shell: pwsh
