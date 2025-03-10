@@ -17,13 +17,22 @@ try {
         try {
             if ($context.Request.HttpMethod -eq 'GET' ){#-and $context.Request.RawUrl -match '^/pokerblinds/calculate') {
                 $params = [System.Web.HttpUtility]::ParseQueryString($context.Request.Url.Query)
-                
-                $result = Get-PokerBlindStructure `
-                    -NumberOfPlayers ($params["NumberOfPlayers"] ? [int]$params["NumberOfPlayers"] : 6) `
-                    -BlindDurationMinutes ($params["BlindDurationMinutes"] ? [int]$params["BlindDurationMinutes"] : 15) `
-                    -StartingSmallBlind ($params["StartingSmallBlind"] ? [int]$params["StartingSmallBlind"] : 25) `
-                    -StartingStack ($params["StartingStack"] ? [int]$params["StartingStack"] : 1000)
-                    
+
+                write-host "Processing request with parameters: $params" -ForegroundColor Cyan
+
+                $PokerGameParams = @{
+                    NumberOfPlayers = ($params["NumberOfPlayers"] ? [int]$params["NumberOfPlayers"] : 4) ;
+                    StartingSmallBlind = ($params["StartingSmallBlind"] ? [int]$params["StartingSmallBlind"] : 1000) ;
+                    StartingStack = ($params["StartingStack"] ? [int]$params["StartingStack"] : 100000) ;
+                    Rebuys = ($params["Rebuys"] ? [int]$params["Rebuys"] : 0) ;
+                    BlindDurationMinutes = ($params["BlindDurationMinutes"] ? [int]$params["BlindDurationMinutes"] : 20) ;
+                    TournamentDurationHours = ($params["TournamentDurationHours"] ? [int]$params["TournamentDurationHours"] : 3) ;
+                    ChipTypes = ($params["ChipTypes"] ? (ConvertFrom-Json -InputObject $params["ChipTypes"]) : @("1000","5000","25000","50000")) ;
+                    GameStartTime = ($params["GameStartTime"] ? [datetime]$params["GameStartTime"] : (Get-Date))
+                }
+
+                $result = Get-PokerBlindStructure @PokerGameParams
+
                 # Create HTML table
                 $htmlTemplate = @"
 <!DOCTYPE html>
@@ -56,11 +65,11 @@ try {
     <script>
         function updateValues() {
             const params = new URLSearchParams();
-            params.append('NumberOfPlayers', document.getElementById('NumberOfPlayers').value);
-            params.append('BlindDurationMinutes', document.getElementById('BlindDurationMinutes').value);
-            params.append('StartingSmallBlind', document.getElementById('StartingSmallBlind').value);
-            params.append('StartingBigBlind', document.getElementById('StartingBigBlind').value);
-            params.append('StartingStack', document.getElementById('StartingStack').value);
+            $(
+                foreach ($PokerGameParam in $PokerGameParams.Keys) {
+                    "params.append('$PokerGameParam', document.getElementById('$PokerGameParam').value);"
+                }
+            )
             
             window.location.href = '/pokerblinds/calculate?' + params.toString();
         }
@@ -68,26 +77,24 @@ try {
 </head>
 <body>
     <form class="config-section" onsubmit="event.preventDefault(); updateValues();">
-        <div class="form-row">
-            <label>Number of Players:</label>
-            <input type="number" id="numPlayers" value="$($params["NumberOfPlayers"] ? $params["NumberOfPlayers"] : 6)">
-        </div>
-        <div class="form-row">
-            <label>Round Length (minutes):</label>
-            <input type="number" id="roundLength" value="$($params["BlindDurationMinutes"] ? $params["BlindDurationMinutes"] : 15)">
-        </div>
-        <div class="form-row">
-            <label>Starting Small Blind:</label>
-            <input type="number" id="startingSmall" value="$($params["StartingSmallBlind"] ? $params["StartingSmallBlind"] : 25)">
-        </div>
-        <div class="form-row">
-            <label>Starting Big Blind:</label>
-            <input type="number" id="startingBig" value="$($params["StartingBigBlind"] ? $params["StartingBigBlind"] : 50)">
-        </div>
-        <div class="form-row">
-            <label>Starting Chips:</label>
-            <input type="number" id="chipsPerPlayer" value="$($params["StartingStack"] ? $params["StartingStack"] : 1000)">
-        </div>
+        $(
+            foreach ($PokerGameParam in $PokerGameParams.Keys) {
+                switch ($PokerGameParam) {
+                    'GameStartTime' {
+                        $inputType = 'datetime-local'
+                    }
+                    'ChipTypes' {
+                        $inputType = 'text'
+                    }
+                    default {
+                        $inputType = 'number'
+                    }
+                }
+                $PokerGameParamJson = $PokerGameParams[$PokerGameParam] | ConvertTo-Json -Compress
+                Write-Host "Processing $PokerGameParam with value $PokerGameParamJson" -ForegroundColor Yellow
+                "<div class='form-row'><label>$PokerGameParam</label><input type='$InputType' id='$PokerGameParam' value='$PokerGameParamJson'></div>"
+            }
+        )
         <button type="submit">Update Values</button>
     </form>
     <table>
